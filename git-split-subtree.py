@@ -50,7 +50,7 @@ def print_and_run(cmd):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Build a catkin ROS (meta)package in an pristine install path.')
+    parser = argparse.ArgumentParser(description='Split a subdirectory out of one git repo into the root of a new repo.')
     parser.add_argument('-s', '--source-repo', type=str, required=True, help='The path to the source repository.')
     parser.add_argument('-d', '--dest-repo', type=str, required=True, help='The path to the destination repository.')
     parser.add_argument('--subdir', type=str, nargs='+', required=True, help='The directory name to create a subtree from, including previous names (renames), in reverse history order.')
