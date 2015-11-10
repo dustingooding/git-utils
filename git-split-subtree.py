@@ -84,8 +84,14 @@ if __name__ == '__main__':
 
     # move all subdirs to the root of the repo
     print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
-                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | git update-index --index-info \
+                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | git update-index --index-info \
                      \' -- --all'.format(slashcat_subdirs))
+
+    # sometimes, a duplicate subdir is created with the most recent name of the subdir (because of git mv vs. rm+new, I believe) so remove it
+    if os.path.exists(args.subdir[0]):
+        print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
+                         git rm -rf --cached --ignore-unmatch {}/ \
+                         \' -- --all'.format(args.subdir[0]))
 
     # remove all "empty" merge commits (using ruby because that's how I found it...)
     with open('/tmp/subtree.rb', 'w') as f:
