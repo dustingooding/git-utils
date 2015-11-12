@@ -80,7 +80,8 @@ if __name__ == '__main__':
     # remove everything but the subdirs you want to keep and move them to the repo root
     print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
                      git ls-files -z | egrep -zv  "^({})" | xargs -0 -r git rm --cached -q \n\
-                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info && mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE \
+                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info \n\
+                     if [ -f "$GIT_INDEX_FILE.new" ]; then mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE; fi \n\
                      \' -- --all'.format(cat_subdirs, slashcat_subdirs))
 
     # remove all "empty" merge commits (using ruby because that's how I found it...)
