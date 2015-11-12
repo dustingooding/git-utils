@@ -77,21 +77,11 @@ if __name__ == '__main__':
     print_and_run('for i in $(git branch -r | sed "s/.*origin\///"); do git branch -t $i origin/$i; done')
     print_and_run('git remote rm origin')
 
-    # remove everything but the subdirs you want to keep
+    # remove everything but the subdirs you want to keep and move them to the repo root
     print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
-                     git ls-files -z | egrep -zv  "^({})" | xargs -0 -r git rm --cached -q \
-                     \' -- --all'.format(cat_subdirs))
-
-    # move all subdirs to the root of the repo
-    print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
-                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | git update-index --index-info \
-                     \' -- --all'.format(slashcat_subdirs))
-
-    # sometimes, a duplicate subdir is created with the most recent name of the subdir (because of git mv vs. rm+new, I believe) so remove it
-    if os.path.exists(args.subdir[0]):
-        print_and_run('git filter-branch -f --tag-name-filter cat --prune-empty --index-filter \' \
-                         git rm -rf --cached --ignore-unmatch {}/ \
-                         \' -- --all'.format(args.subdir[0]))
+                     git ls-files -z | egrep -zv  "^({})" | xargs -0 -r git rm --cached -q \n\
+                     git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info && mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE \
+                     \' -- --all'.format(cat_subdirs, slashcat_subdirs))
 
     # remove all "empty" merge commits (using ruby because that's how I found it...)
     with open('/tmp/subtree.rb', 'w') as f:
