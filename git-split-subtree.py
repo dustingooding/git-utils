@@ -57,8 +57,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # prep subdir arguments for later
-    cat_subdirs = '|'.join(args.subdir)
-    slashcat_subdirs = '|'.join('{}\\'.format(x) for x in args.subdir)
+    cat_slash_subdirs = '|'.join('{}/'.format(x) for x in args.subdir)
+    cat_backslash_subdirs = '|'.join('{}\\'.format(x) for x in args.subdir)
 
     if not os.path.exists(args.source_repo):
         print '>>> MISSING source repo directory'
@@ -82,7 +82,7 @@ if __name__ == '__main__':
                      git ls-files -z | egrep -zv  "^({})" | xargs -0 -r git rm --cached -q \n\
                      git ls-files -s | sed -e "s-\\t\\({})/-\\t-" | sort | uniq | GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info \n\
                      if [ -f "$GIT_INDEX_FILE.new" ]; then mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE; fi \n\
-                     \' -- --all'.format(cat_subdirs, slashcat_subdirs))
+                     \' -- --all'.format(cat_slash_subdirs, cat_backslash_subdirs))
 
     # remove all "empty" merge commits (using ruby because that's how I found it...)
     with open('/tmp/subtree.rb', 'w') as f:
