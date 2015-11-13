@@ -54,6 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--source-repo', type=str, required=True, help='The path to the source repository.')
     parser.add_argument('-d', '--dest-repo', type=str, required=True, help='The path to the destination repository.')
     parser.add_argument('--subdir', type=str, nargs='+', required=True, help='The directory name to create a subtree from, including previous names (renames), in reverse history order.')
+    parser.add_argument('--clean', default=False, action='store_true', help='Clean up merged branches (assumes git-flow master and develop permanent branches).')
     args = parser.parse_args()
 
     # prep subdir arguments for later
@@ -99,3 +100,8 @@ if __name__ == '__main__':
     print_and_run('git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d')
     print_and_run('git reflog expire --expire=now --all')
     print_and_run('git gc --aggressive --prune=now')
+
+    # clean up merged branches
+    if (args.clean):
+        print_and_run('git checkout develop')
+        print_and_run('git branch --merged | grep -v "\*" | grep -v master | grep -v develop | xargs -n 1 git branch -d')
