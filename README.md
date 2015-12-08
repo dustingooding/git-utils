@@ -1,1 +1,1 @@
-git_utils
+git_utils 1.0.0
